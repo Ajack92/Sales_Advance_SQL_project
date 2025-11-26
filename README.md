@@ -1,7 +1,7 @@
 # Sales_Advance_SQL_project
 
 
-##Advance Data Analysis--
+### Advance Data Analysis Project.
 
 ### Over time trends
 ### How a mseasure evolves ove time.Helps in tracking trends and identify seasonality in data
@@ -18,8 +18,9 @@ group by year(order_date)
 order by 1;
 ```
 
----Sales and customer performance over time
+### 2. Sales and customer performance over time
 
+```sql
 select year(order_date) as order_year,
 sum(sales_amount) as total_sales,
 count(distinct customer_key) as total_customers
@@ -27,9 +28,10 @@ from [gold.fact_sales]
 where order_date is not null
 group by year(order_date)
 order by 1
+```
+### 3. Sales , Quantity, and customer performance over time
 
----Sales , Quantity, and customer performance over time
-
+```sql
 select year(order_date) as order_year,
 sum(sales_amount) as total_sales,
 count(distinct customer_key) as total_customers,
@@ -38,9 +40,11 @@ from [gold.fact_sales]
 where order_date is not null
 group by year(order_date)
 order by 1
+```
 
----By month
+### 4. By month
 
+```sql
 select month(order_date) as order_month,
 sum(sales_amount) as total_sales,
 count(distinct customer_key) as total_customers,
@@ -49,9 +53,10 @@ from [gold.fact_sales]
 where order_date is not null
 group by month(order_date)
 order by 1
+```
+### 5. By month and year 
 
---by month and year 
-
+```sql
 select year(order_date) as order_year,
 month(order_date) as order_month,
 sum(sales_amount) as total_sales,
@@ -61,8 +66,11 @@ from [gold.fact_sales]
 where order_date is not null
 group by month(order_date),year(order_date)
 order by 1,2
+```
 
----using datetrunc 
+### 7. using datetrunc 
+
+```sql
 
 select datetrunc(month,order_date) as order_month,
 sum(sales_amount) as total_sales,
@@ -72,8 +80,10 @@ from [gold.fact_sales]
 where order_date is not null
 group by datetrunc(month,order_date)
 order by 1
+```
+### 8. Using datetrunc
 
-
+```sql
 select datetrunc(year,order_date) as order_year,
 sum(sales_amount) as total_sales,
 count(distinct customer_key) as total_customers,
@@ -82,21 +92,18 @@ from [gold.fact_sales]
 where order_date is not null
 group by datetrunc(year,order_date)
 order by 1
+```
+
+###  Cumilative Analysis- Aggregate the data progressively over time
+###  Helps to understand whether our business is growing or declining 
+
+### Aggregate cumlative measure by date diamension
 
 
-----Cumilative Analysis- Aggregate the data progressively over time
-----Helps to understand whether our business is growing or declining 
-
-----Aggregate cumlative measure by date diamension
-
-
-----Calculate the total sales per month and 
-----Running total of sale over time
-----using window function
-
-(--default window frame b/w unbounded preceding and current row)
-
-
+### 9. Calculate the total sales per month and Running total of sale over time using window function
+        (default window frame b/w unbounded preceding and current row)
+		
+```sql
 select 
 order_date,
 total_sales,
@@ -111,10 +118,10 @@ where order_date is not null
 group by datetrunc(month,order_date)
 ) t
 
+```
+### 10. partition by month
 
-----partition by month
-
-
+```sql
 select 
 order_date,
 total_sales,
@@ -128,9 +135,10 @@ from [gold.fact_sales]
 where order_date is not null
 group by datetrunc(month,order_date)
 ) t
+```
+### 11. partition by year
 
-----partition by year
-
+```sql
 select 
 order_date,
 total_sales,
@@ -144,10 +152,11 @@ from [gold.fact_sales]
 where order_date is not null
 group by datetrunc(year,order_date)
 ) t
+```
 
+### 12. Moving Average of the price
 
----Moving Average of the price
-
+```sql
 select 
 order_date,
 total_sales,
@@ -163,16 +172,16 @@ from [gold.fact_sales]
 where order_date is not null
 group by datetrunc(year,order_date)
 )t
+```
 
-----Performance Analysis
-----its a process of comparing current value with target value
-----helps to measure success and compare performance
----Formula- current[Meaure] - Target[measure] eg : current sales - Average sales
+### Performance Analysis
+### its a process of comparing current value with target value
+### Helps to measure success and compare performance
+### Formula- current[Meaure] - Target[measure] eg : current sales - Average sales
 
-----analyze the yearly performace of products by comparing their sales to both average sales performance 
-----of the product and the prevous year's sales
+### 13. Analyze the yearly performace of products by comparing their sales to both average sales performance of the product and the prevous year's sales
 
-
+```sql
 with yearly_product_sales as(
 	select 
 	year(s.order_date) as order_year,
@@ -201,20 +210,19 @@ end as avg_change,
  end as py_change
 	from yearly_product_sales
 	order by product_name, order_year
+```
 
 
 
+### Proportonal analysis --part to whole 
+### Analyze how an individual part is performing compared to overall, allowing us to 
+### understand which category has greatest impact on business
+     [Measure]/total[measure])*100 by dimension 
+     eg: (sales/total sales)*100 by country
 
----proportonal analysis --part to whole 
-----analyze how an individual part is performing compared to overall, allowing us to 
-----understand which category has greatest impact on business
+### 14. which category contribute the most to overall sales?
 
----([Measure]/total[measure])*100 by dimension 
-
---eg: (sales/total sales)*100 by country
-
----which category contribute the most to overall sales?
-
+```sql
 with category_sales as(
 select
 p.category,
@@ -231,20 +239,20 @@ sum(total_sales) over() overall_sales,
 concat(round((cast(total_sales as float) / sum(total_sales) over()) *100,2),'%') as percentage_of_total
 from category_sales
 order by total_sales DESC
+```
 
 
+### Data segmentation
+### Group the data based on specific range
+### heps to understand corelation b/w two meaures 
+[measure] by [measure]--
+eg: total products by sales range
+    --total customers by age---
 
----Data segmentation ---
----Group the data based on specific range
-----heps to understand corelation b/w two meaures 
---[measure] by [measure]--
---eg: total products by sales range
---    total customers by age---
+### segment products into cost ranges and 
+### 15. count how many products fall into each segment
 
----segment products into cost ranges and 
----count how many products fall into each segment
-
-
+```sql
 with product_segment as(
 select 
 product_key,
@@ -263,13 +271,15 @@ count(product_key) as total_products
 from product_segment
 group by cost_range
 order by 2 desc 
+```
 
---Group customers into three segament based on their spending behaviour:
---- VIP:customers with at least 12 months of history and spending more than 5000
----Regular customers with atleast 12 months of history but spending 5000 or less
----new customers with a lifespan less than 12 months
---- find total no of customers by each group 
+### 16. Group customers into three segament based on their spending behaviour:
+    VIP:customers with at least 12 months of history and spending more than 5000
+    Regular customers with atleast 12 months of history but spending 5000 or less
+    new customers with a lifespan less than 12 months
+    find total no of customers by each group 
 
+```sql
 with customer_spending as (
 
 select c.customer_id,
@@ -295,6 +305,7 @@ from (
 	from customer_spending)t
 group by customer_segment 
 order by total DESC
+```
 
 /*
 ==========================================================
