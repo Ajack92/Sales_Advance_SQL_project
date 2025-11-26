@@ -1,11 +1,13 @@
-/*
+
 ==========================================================
-product report
+### product report
 ==========================================================
 
-*/
---1. base query: retrieves core columns from tables
 
+### 1. base query: retrieves core columns from tables
+
+```sql	
+	
 create view report_products as 
 
 with product_base as (
@@ -77,7 +79,4 @@ select
 		 else total_sales/life_span
 	end as avg_monthly_revenue
 from product_aggregate
-
-
-select * 
-from report_products
+```
